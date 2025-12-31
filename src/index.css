@@ -1,0 +1,293 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Coreveil Professional Theme - Luxury Engineering */
+    
+    /* Core Brand Colors */
+    --background: 210 17% 5%;           /* #0B0D10 - Obsidian Black */
+    --foreground: 216 43% 97%;          /* #F5F7FA - High Contrast White */
+
+    --card: 220 16% 10%;                /* #141821 - Carbon Gray */
+    --card-foreground: 216 43% 97%;
+
+    --popover: 220 16% 10%;
+    --popover-foreground: 216 43% 97%;
+
+    /* Coreveil Gold - Primary Accent */
+    --primary: 45 58% 52%;              /* #D4AF37 */
+    --primary-foreground: 210 17% 5%;   /* Dark text on gold */
+
+    /* Secondary & Muted */
+    --secondary: 220 16% 10%;           /* #141821 - Carbon Gray */
+    --secondary-foreground: 216 43% 97%;
+
+    --muted: 220 16% 10%;
+    --muted-foreground: 220 8% 65%;     /* #B8BCC6 - Muted Silver */
+
+    /* Accent - Soft Gold Highlight */
+    --accent: 45 66% 63%;               /* #E6C75A */
+    --accent-foreground: 210 17% 5%;
+
+    /* Status Colors */
+    --destructive: 0 60% 55%;           /* #D64545 */
+    --destructive-foreground: 216 43% 97%;
+
+    --success: 156 48% 49%;             /* #3FB984 */
+    --warning: 45 100% 44%;             /* #E0A800 */
+
+    /* Borders & Inputs */
+    --border: 220 15% 18%;              /* #2A2F3A */
+    --input: 220 15% 18%;
+    --ring: 45 58% 52%;                 /* Gold focus ring */
+
+    --radius: 0.5rem;                   /* 8px */
+
+    /* Custom Coreveil Tokens */
+    --obsidian-black: 210 17% 5%;       /* #0B0D10 */
+    --carbon-gray: 220 16% 10%;         /* #141821 */
+    --coreveil-gold: 45 58% 52%;        /* #D4AF37 */
+    --gold-highlight: 45 66% 63%;       /* #E6C75A */
+    --antique-gold: 45 80% 35%;         /* #9E7C19 */
+    --muted-silver: 220 8% 65%;         /* #B8BCC6 */
+    --low-priority: 220 5% 51%;         /* #7A7F89 */
+
+    /* Typography */
+    --font-heading: 'Raleway', system-ui, sans-serif;
+    --font-body: 'Raleway', system-ui, sans-serif;
+
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark {
+    --background: 210 17% 5%;
+    --foreground: 216 43% 97%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-body);
+    font-size: 1.0625rem; /* 17px base */
+    line-height: 1.65;
+    font-weight: 400;
+  }
+
+  /* Custom Scrollbar - Coreveil Theme */
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+    border-left: 1px solid hsl(var(--border));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, hsl(var(--primary)), hsl(var(--accent)));
+    border-radius: 6px;
+    border: 2px solid hsl(var(--background));
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, hsl(var(--accent)), hsl(var(--primary)));
+  }
+
+  /* Firefox Scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--primary)) hsl(var(--background));
+  }
+
+  h1 {
+    font-family: var(--font-heading);
+    @apply font-bold;
+    font-size: 3.75rem; /* 60px desktop */
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  @media (max-width: 768px) {
+    h1 {
+      font-size: 2.625rem; /* 42px mobile */
+    }
+  }
+
+  h2 {
+    font-family: var(--font-heading);
+    @apply font-semibold;
+    font-size: 2.5rem; /* 40px */
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  h3 {
+    font-family: var(--font-heading);
+    @apply font-semibold;
+    font-size: 1.5rem; /* 24px */
+    line-height: 1.3;
+  }
+
+  h4, h5, h6 {
+    font-family: var(--font-heading);
+    @apply font-semibold tracking-wide;
+  }
+
+  p {
+    line-height: 1.65;
+  }
+}
+
+@layer components {
+  .section-container {
+    @apply max-w-[1240px] mx-auto px-6 lg:px-8;
+  }
+
+  .section-padding {
+    @apply py-24 lg:py-32;
+  }
+
+  .section-alt {
+    @apply bg-card;
+  }
+
+  .text-gradient-cyan {
+    @apply bg-gradient-to-r from-[#D4AF37] to-[#E6C75A] bg-clip-text text-transparent;
+  }
+
+  .divider-line {
+    @apply h-px bg-border;
+  }
+
+  /* Fade in animation for hero sections */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  .hover-lift {
+    @apply transition-transform duration-300 hover:-translate-y-1;
+  }
+
+  .link-underline {
+    @apply relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full;
+  }
+
+  .glow-cyan {
+    box-shadow: 0 0 20px hsl(var(--electric-cyan) / 0.3);
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:border-primary/60 hover:shadow-xl;
+    background: linear-gradient(135deg, rgba(20, 24, 33, 0.7) 0%, rgba(11, 13, 16, 0.8) 100%);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37),
+                inset 0 1px 1px 0 rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .card-hover:hover {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(20, 24, 33, 0.75) 100%);
+    box-shadow: 0 12px 40px 0 rgba(212, 175, 55, 0.15),
+                0 8px 32px 0 rgba(0, 0, 0, 0.37),
+                inset 0 1px 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  .animate-on-scroll {
+    @apply opacity-0 translate-y-8 transition-all duration-700 ease-out;
+  }
+
+  .animate-on-scroll.visible {
+    @apply opacity-100 translate-y-0;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Accessibility - Focus Styles */
+  :focus-visible {
+    @apply outline outline-2 outline-offset-2 outline-[#D4AF37];
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    @apply outline outline-2 outline-offset-2 outline-[#D4AF37];
+  }
+
+  /* Skip to main content link */
+  .skip-to-main {
+    @apply absolute -top-14 left-0 z-50 bg-[#D4AF37] text-[#0B0D10] px-4 py-2 rounded font-semibold focus:top-0 transition-all;
+  }
+
+  /* Improved button keyboard navigation */
+  button {
+    @apply focus:outline-2 focus:outline-offset-2 focus:outline-[#D4AF37];
+  }
+
+  /* Link focus improvements */
+  a {
+    @apply focus:outline-2 focus:outline-offset-2 focus:outline-[#D4AF37];
+  }
+
+  /* Form input focus */
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  textarea,
+  select {
+    @apply focus:outline-2 focus:outline-offset-2 focus:outline-[#D4AF37];
+  }
+
+  /* High contrast focus states for accessibility */
+  @media (prefers-contrast: more) {
+    :focus-visible {
+      @apply outline-4;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

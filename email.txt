@@ -1,0 +1,536 @@
+================================================================================
+                     EMAIL CONFIGURATION & SETUP GUIDE
+================================================================================
+Project: Corvil Website
+Date Created: December 31, 2025
+Purpose: Complete email system documentation for new website implementation
+
+================================================================================
+1. EMAIL SERVICE PROVIDER
+================================================================================
+Service: EmailJS
+Version: @emailjs/browser ^4.4.1
+Documentation: https://www.emailjs.com/
+Type: Browser-based email sending service (no backend required)
+
+================================================================================
+2. REQUIRED ENVIRONMENT VARIABLES
+================================================================================
+The following environment variables must be set in .env file:
+
+VITE_EMAILJS_SERVICE_ID=service_ipy8jwj
+VITE_EMAILJS_TEMPLATE_ID=template_q4e5q55
+VITE_EMAILJS_PUBLIC_KEY=d0rxH1XQuvtRoLgT
+
+NOTE: These are prefixed with "VITE_" because the project uses Vite as build tool.
+Variables prefixed with VITE_ are automatically exposed to client-side code.
+
+CURRENT CONFIGURATION (Corvil Project):
+- Service ID: service_ipy8jwj
+- Template ID: template_q4e5q55
+- Public Key: d0rxH1XQuvtRoLgT
+
+================================================================================
+3. ENVIRONMENT SETUP STEPS
+================================================================================
+
+CORVIL PROJECT .ENV TEMPLATE (Copy & Paste):
+---
+VITE_EMAILJS_SERVICE_ID=service_ipy8jwj
+VITE_EMAILJS_TEMPLATE_ID=template_q4e5q55
+VITE_EMAILJS_PUBLIC_KEY=d0rxH1XQuvtRoLgT
+---
+
+Step 1: Create EmailJS Account
+- Visit https://www.emailjs.com/
+- Sign up for a free account
+- Verify your email
+
+Step 2: Create Email Service
+- Go to "Email Services" in dashboard
+- Click "Create New Service"
+- Choose your email provider (Gmail, Outlook, etc.) or use EmailJS SMTP
+- Connect your email account
+- Your Service ID: service_ipy8jwj
+
+Step 3: Create Email Template
+- Go to "Email Templates"
+- Click "Create New Template"
+- Name: Contact Form Template (or your preference)
+- Design the template with these variables:
+  * {{name}}         - Sender's name
+  * {{email}}        - Sender's email
+  * {{service}}      - Selected service/interest
+  * {{message}}      - Message content
+  * {{time}}         - Submission timestamp
+- Your Template ID: template_q4e5q55
+
+Step 4: Get Public Key
+- Go to "Account" → "API Keys"
+- Your Public Key: d0rxH1XQuvtRoLgT
+
+Step 5: Create .env File
+- Create a .env file in the project root (same level as package.json)
+- Copy the template above exactly
+- NEVER commit .env to version control (add to .gitignore)
+- Save and restart development server
+
+================================================================================
+4. NPM DEPENDENCIES
+================================================================================
+
+Core Email Package:
+"@emailjs/browser": "^4.4.1"
+
+Related Dependencies Already Installed:
+- @hookform/resolvers: ^3.10.0      (Form validation)
+- zod: ^3.x.x                        (Schema validation)
+- react-hook-form: ^7.x.x            (Form management)
+
+Installation Command:
+npm install @emailjs/browser
+(or: bun add @emailjs/browser for Bun)
+
+================================================================================
+5. IMPLEMENTATION CODE REFERENCE
+================================================================================
+
+FILE: src/pages/Contact.tsx
+
+Import Statement:
+```typescript
+import emailjs from '@emailjs/browser';
+```
+
+Initialization (in useEffect):
+```typescript
+useEffect(() => {
+  if (publicKey) {
+    emailjs.init(publicKey);
+  }
+}, [publicKey]);
+```
+
+Configuration Variables:
+```typescript
+const sanitize = (value?: string) => value?.trim() || '';
+const serviceId = sanitize(import.meta.env.VITE_EMAILJS_SERVICE_ID);
+const templateId = sanitize(import.meta.env.VITE_EMAILJS_TEMPLATE_ID);
+const publicKey = sanitize(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
+```
+
+Email Sending Function:
+```typescript
+try {
+  await emailjs.send(serviceId, templateId, {
+    name: values.name,
+    email: values.email,
+    service: values.interest,
+    message: values.message,
+    time: formattedTime,
+  });
+  // Show success message
+} catch (error) {
+  // Handle error
+}
+```
+
+================================================================================
+6. FORM STRUCTURE
+================================================================================
+
+Contact Form Fields:
+1. Name (string, required, min 2 characters)
+2. Email (string, required, valid email format)
+3. Service of Interest (select dropdown):
+   - AI Automation
+   - Web Development
+   - Tech Consulting
+   - MVP Development
+   - Other
+4. Message (string, required, min 10 characters)
+
+Form Validation:
+- Uses Zod schema for runtime validation
+- Uses react-hook-form for form state management
+- Uses @hookform/resolvers/zod for integration
+
+================================================================================
+7. FORM SUBMISSION FLOW
+================================================================================
+
+1. User fills out all required fields
+2. Form validation occurs on blur and submit
+3. On submit:
+   a. Check if all environment variables are set
+   b. Format current date/time in US locale (e.g., "Dec 31, 2025, 3:45 PM")
+   c. Send email via EmailJS with form data
+   d. On success: Show toast notification, reset form
+   e. On error: Show error toast, log to console
+
+Error Handling:
+- Missing config variables: Displays specific missing variables
+- Send failure: Shows generic error message
+- Network issues: Handled by emailjs library
+
+Success Message:
+"Message sent - We typically respond within 24 business hours."
+
+================================================================================
+8. TOAST NOTIFICATIONS
+================================================================================
+
+Hook Used: useToast from @/components/ui/use-toast
+
+Success Toast:
+```typescript
+toast({ 
+  title: 'Message sent', 
+  description: 'We typically respond within 24 business hours.' 
+});
+```
+
+Error Toast:
+```typescript
+toast({ 
+  title: 'Send failed', 
+  description: 'Could not send your message. Please try again.', 
+  variant: 'destructive' 
+});
+```
+
+Config Error Toast:
+```typescript
+toast({
+  title: 'Send failed',
+  description: `Missing config: ${missing.map((m) => m.label).join(', ')}`,
+  variant: 'destructive',
+});
+```
+
+================================================================================
+9. CONTACT INFORMATION DISPLAY
+================================================================================
+
+FILE: src/components/ContactSection.tsx
+
+Contact Details Structure:
+```typescript
+const contactInfo = [
+  {
+    icon: MapPin,
+    label: 'Location',
+    value: '123 Melrose Avenue, Los Angeles, CA 90046',
+  },
+  {
+    icon: Clock,
+    label: 'Hours',
+    value: 'Mon-Sat: 11AM - 8PM | Sun: Closed',
+  },
+  {
+    icon: Phone,
+    label: 'Phone',
+    value: '+1 (323) 555-0123',
+    href: 'tel:+13235550123',
+  },
+  {
+    icon: Mail,
+    label: 'Email',
+    value: 'hello@themark.studio',
+    href: 'mailto:hello@themark.studio',
+  },
+];
+```
+
+Update these values with your actual company information:
+- Location: Your business address
+- Hours: Operating hours
+- Phone: Contact phone number
+- Email: Contact email address
+
+================================================================================
+10. SOCIAL MEDIA CONTACT CHANNELS
+================================================================================
+
+Integrated in Contact.tsx:
+
+1. Twitter/X:
+   URL: https://x.com/coreveilagency?s=11
+   Handle: @coreveilagency
+
+2. Instagram:
+   URL: https://www.instagram.com/core.veil?igsh=MThzcGs2M3Bkamx3Mg%3D%3D&utm_source=qr
+   Handle: @core.veil
+
+3. WhatsApp:
+   URL: https://wa.me/message/OVPH6OOZQNIOB1
+   Type: WhatsApp Business or Direct message link
+
+4. LinkedIn:
+   URL: https://www.linkedin.com/company/coreveil/
+   Type: Company page
+
+================================================================================
+11. PACKAGES & DEPENDENCIES SUMMARY
+================================================================================
+
+Email & Forms:
+- @emailjs/browser@^4.4.1     - Email sending
+- @hookform/resolvers@^3.10.0 - Form validation integration
+- zod@latest                   - Schema validation
+- react-hook-form@latest       - Form state management
+
+UI Components (Pre-installed):
+- Input component
+- Textarea component
+- Label component
+- Button component
+- Toast/Toaster component
+
+Icons (lucide-react):
+- MapPin, Clock, Phone, Mail, ExternalLink
+- Linkedin, Instagram, MessageCircle, Twitter
+
+================================================================================
+12. TROUBLESHOOTING GUIDE
+================================================================================
+
+Issue: "Missing config: VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID, VITE_EMAILJS_PUBLIC_KEY"
+Solution:
+1. Verify .env file exists in project root
+2. Check EmailJS account and copy correct values
+3. Restart development server after adding .env
+4. Ensure .env is in .gitignore
+
+Issue: Emails not sending but no error message
+Solution:
+1. Verify EmailJS service is active
+2. Check email template variables match form data
+3. Verify email template is published
+4. Check browser console for detailed error
+
+Issue: Form validation failing
+Solution:
+1. Name: Must be at least 2 characters
+2. Email: Must be valid email format
+3. Service: Must select from dropdown
+4. Message: Must be at least 10 characters
+
+Issue: CORS errors
+Solution:
+1. EmailJS is browser-based, no CORS issues typically
+2. If issues occur, verify public key is correct
+3. Check EmailJS dashboard for browser restrictions
+
+Issue: Emails going to spam
+Solution:
+1. Use verified email address in EmailJS
+2. Add SPF/DKIM records if using custom domain
+3. Test with personal email first
+4. Check email template for spam keywords
+
+================================================================================
+13. DEPLOYMENT CONSIDERATIONS
+================================================================================
+
+Build Command:
+npm run build
+(Creates optimized production build)
+
+Environment Variables on Deployment:
+1. Vercel: Add variables in project settings
+2. Netlify: Add in "Build & Deploy" settings
+3. Other: Add to .env file or environment config
+
+Security Notes:
+- Public key is safe to expose (it's meant to be public)
+- Never commit .env file with sensitive data
+- Monitor EmailJS quota and rate limits
+- Consider CAPTCHA for production to prevent abuse
+
+Production Response Time:
+- EmailJS typically sends within 1-5 seconds
+- Set user expectation: "We respond within 24 business hours"
+
+================================================================================
+14. FILE STRUCTURE FOR EMAIL IMPLEMENTATION
+================================================================================
+
+File Tree:
+src/
+  pages/
+    └── Contact.tsx              ← Main contact form & email logic
+  components/
+    └── ContactSection.tsx       ← Contact info display
+    └── ui/
+        ├── input.tsx            ← Form input component
+        ├── textarea.tsx         ← Form textarea component
+        ├── label.tsx            ← Form label component
+        ├── button.tsx           ← Form submit button
+        ├── use-toast.ts         ← Toast notification hook
+        └── toaster.tsx          ← Toast display component
+  hooks/
+    └── use-toast.ts             ← Toast hook
+
+Project Root:
+├── package.json               ← Contains @emailjs/browser dependency
+├── .env                       ← Environment variables (NOT in git)
+├── .gitignore                 ← Should include .env
+└── vite.config.ts             ← Vite configuration
+
+================================================================================
+15. COPY & PASTE SETUP CHECKLIST
+================================================================================
+
+[ ] Install @emailjs/browser package
+[ ] Create EmailJS account at emailjs.com
+[ ] Create Email Service in EmailJS dashboard
+[ ] Create Email Template in EmailJS dashboard
+[ ] Get Service ID from EmailJS
+[ ] Get Template ID from EmailJS
+[ ] Get Public Key from EmailJS Account settings
+[ ] Create .env file in project root
+[ ] Add VITE_EMAILJS_SERVICE_ID to .env
+[ ] Add VITE_EMAILJS_TEMPLATE_ID to .env
+[ ] Add VITE_EMAILJS_PUBLIC_KEY to .env
+[ ] Add .env to .gitignore (if not already)
+[ ] Restart development server
+[ ] Test contact form with test email
+[ ] Verify email is received
+[ ] Update contact information in ContactSection.tsx
+[ ] Update social media links in Contact.tsx
+[ ] Test on production build (npm run build && npm run preview)
+
+================================================================================
+16. QUICK START TEMPLATE
+================================================================================
+
+For new website setup with same structure:
+
+1. Install Package:
+   npm install @emailjs/browser @hookform/resolvers zod react-hook-form
+
+2. Create .env:
+   VITE_EMAILJS_SERVICE_ID=your_service_id
+   VITE_EMAILJS_TEMPLATE_ID=your_template_id
+   VITE_EMAILJS_PUBLIC_KEY=your_public_key
+
+3. Copy Contact.tsx to new project
+   (Location: src/pages/Contact.tsx)
+
+4. Copy ContactSection.tsx to new project
+   (Location: src/components/ContactSection.tsx)
+
+5. Update email addresses and social links with new website info
+
+6. Test the contact form
+
+================================================================================
+17. ADDITIONAL RESOURCES
+================================================================================
+
+EmailJS Documentation:
+https://www.emailjs.com/docs/
+
+React Hook Form:
+https://react-hook-form.com/
+
+Zod Validation:
+https://zod.dev/
+
+Radix UI (Component Library):
+https://www.radix-ui.com/
+
+================================================================================
+18. VERSION INFORMATION
+================================================================================
+
+Project Dependencies (from package.json):
+- @emailjs/browser: ^4.4.1
+- @hookform/resolvers: ^3.10.0
+- react-hook-form: ^7.x.x (implied)
+- zod: ^3.x.x (implied)
+- framer-motion: ^12.23.26
+- tailwindcss: (for styling)
+- shadcn/ui: (component library)
+
+Build Tool: Vite
+Package Manager: Bun (or npm)
+Framework: React 18+
+Language: TypeScript
+
+================================================================================
+19. FORM TEMPLATE FOR EMAIL
+================================================================================
+
+Recommended EmailJS Template Structure:
+
+Subject: New Contact Form Submission from {{name}}
+
+Body:
+---
+Name: {{name}}
+Email: {{email}}
+Service of Interest: {{service}}
+Submitted: {{time}}
+
+Message:
+{{message}}
+---
+
+Reply-To: {{email}}
+
+================================================================================
+20. IMPORTANT NOTES
+================================================================================
+
+✓ This website uses client-side email sending (no backend server needed)
+✓ EmailJS handles SMTP authentication securely
+✓ Form data is sent directly from browser to EmailJS
+✓ Environment variables are required for production
+✓ Tests emails before going live to ensure delivery
+✓ Monitor EmailJS dashboard for quota usage
+✓ Consider adding rate limiting for production
+✓ Toast notifications provide user feedback
+✓ Form validation prevents invalid submissions
+✓ Contact info should be updated for your business
+
+================================================================================
+21. CORVIL PROJECT CREDENTIALS (FOR NEW WEBSITE SETUP)
+================================================================================
+
+ACTIVE EMAILJS CREDENTIALS:
+Service ID:    service_ipy8jwj
+Template ID:   template_q4e5q55
+Public Key:    d0rxH1XQuvtRoLgT
+
+.ENV FILE CONTENT (for new website):
+---
+VITE_EMAILJS_SERVICE_ID=service_ipy8jwj
+VITE_EMAILJS_TEMPLATE_ID=template_q4e5q55
+VITE_EMAILJS_PUBLIC_KEY=d0rxH1XQuvtRoLgT
+---
+
+SETUP INSTRUCTIONS FOR NEW WEBSITE:
+1. Create new Vite + React project
+2. Install @emailjs/browser package
+3. Copy src/pages/Contact.tsx from Corvil project
+4. Copy src/components/ContactSection.tsx from Corvil project
+5. Create .env file with credentials above
+6. Update contact information (phone, email, location)
+7. Update social media links
+8. Test contact form
+9. Deploy
+
+EmailJS Dashboard:
+- Account Email: (Check EmailJS account)
+- Service Status: Active
+- Template Status: Active
+- Rate Limit: Check on EmailJS dashboard
+
+================================================================================
+END OF EMAIL CONFIGURATION DOCUMENT
+================================================================================
+Last Updated: December 31, 2025
+Ready for implementation in new website with same structure.
+================================================================================
